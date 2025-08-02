@@ -1,17 +1,17 @@
 using System;
 
-public class Subject
+public class SubjectObstacleHitKing
 {
-    public static Subject Instance { get; private set; } = new();
+    public static SubjectObstacleHitKing Instance { get; private set; } = new();
 
     public event Action TellObstacleHitKing;
 
-    private Subject()
+    private SubjectObstacleHitKing()
     {
         Instance = this;
     }
 
-    ~Subject()
+    ~SubjectObstacleHitKing()
     {
         Instance = null;
     }

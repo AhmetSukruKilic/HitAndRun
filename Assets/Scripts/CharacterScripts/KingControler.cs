@@ -1,12 +1,11 @@
 using UnityEngine;
 
-public class King : MonoBehaviour, IObserveTellObstacleHitKing
+public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
 {
-    private Rigidbody _rb;
-    private float moveSpeed = 4f;
-    private float jumpForce = 5f;
+    private KingStats _kingStats;
+    public KingStats KingStats { get => _kingStats; set => _kingStats = value; }
 
-    private const float TARGET_Z = 0f;
+    private Rigidbody _rb;
 
     private float _forwardTimer = 0;
     private bool _obstacleHitRecently = true;
@@ -14,10 +13,13 @@ public class King : MonoBehaviour, IObserveTellObstacleHitKing
 
     private const float FRICTION = 0.5f;
     private const float TIME_DURATION = 4;
-    private readonly Vector3 START_SET = new(0, 0.1f, -1f);
+    private readonly Vector3 START_SET = new(0, 0.1f, -0.3f);
+    private const float TARGET_Z = 0f;
 
-    void Start()
+
+    void Awake()
     {
+        KingStats = new KingStats();
         transform.position = START_SET;
 
         _rb = GetComponent<Rigidbody>();
@@ -27,12 +29,12 @@ public class King : MonoBehaviour, IObserveTellObstacleHitKing
     void Update()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
-        Vector3 move = new Vector3(horizontal * moveSpeed, _rb.linearVelocity.y, 0);
+        Vector3 move = new Vector3(horizontal * KingStats.MoveSpeed, _rb.linearVelocity.y, 0);
         _rb.linearVelocity = move;
 
         if (Input.GetKeyDown(KeyCode.Space) && CanJump())
         {
-            _rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            _rb.AddForce(Vector3.up * KingStats.JumpForce, ForceMode.Impulse);
         }
 
         if (_obstacleHitRecently)
@@ -74,7 +76,7 @@ public class King : MonoBehaviour, IObserveTellObstacleHitKing
 
         _forceVector = new Vector3(0f, 0f, force);
 
-        _rb.AddForce(_forceVector * 2, ForceMode.Impulse);
+        _rb.AddForce(_forceVector, ForceMode.Impulse);
     }
 
     private bool CanJump()
@@ -84,25 +86,22 @@ public class King : MonoBehaviour, IObserveTellObstacleHitKing
 
     private void OnCollisionEnter(Collision collision)
     {
-        GameObject rootObj = collision.gameObject;
+        Obstacle rootObj = collision.gameObject.GetComponent<Obstacle>();
 
         if (rootObj != null)
         {
-            if (rootObj.CompareTag("Obstacle"))
-            {
-                Subject.Instance.NotifyObserversTellObstacleHitKing();
-            }
+            SubjectObstacleHitKing.Instance.NotifyObserversTellObstacleHitKing();   
         }
     }
 
     void OnEnable()
     {
-        Subject.Instance.AddObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
+        SubjectObstacleHitKing.Instance.AddObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
     }
 
     void OnDestroy()
     {
-        Subject.Instance.RemoveObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
+        SubjectObstacleHitKing.Instance.RemoveObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
     }
 
     public void OnNotifyTellObstacleHitKing()
@@ -112,7 +111,7 @@ public class King : MonoBehaviour, IObserveTellObstacleHitKing
         {
             Debug.Log("GameEnded");   // put this to Subject to change ui
         }
-
+        
         _forwardTimer = 0f;
         _obstacleHitRecently = true;
     }

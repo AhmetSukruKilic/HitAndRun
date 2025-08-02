@@ -22,7 +22,7 @@ public class LevelGenerator : MonoBehaviour
     private float _lengthOfFloor;
     private float _destroyIndex;
     private const float CAMERA_DISTANCE = 2.5f;
-    private readonly Vector3 INITIAL_POSITION = new Vector3(0, 0, 3);
+    private readonly Vector3 INITIAL_POSITION = new Vector3(0, 0, 6);
     public const int INITIAL_NUMBER_FLOORS = 9;
 
     void Start()
@@ -34,7 +34,11 @@ public class LevelGenerator : MonoBehaviour
 
         Instance = this;
 
-        if (_defaultFloor == null) return;
+        if (_defaultFloor == null)
+        {
+            Debug.Log("initialize default floor");
+            return;
+        }
 
         InitializeConsts();
         InitialFloors();

@@ -4,7 +4,7 @@ using UnityEngine;
 public class RandomFloor : MonoBehaviour
 {
     [SerializeField]
-    private Transform _chunkParent;
+    private Transform _randomFloorParent;
 
     [SerializeField]
     private List<Floor> _floorList;
@@ -33,7 +33,7 @@ public class RandomFloor : MonoBehaviour
             return GetRecycledFloor(position, randomNumFloor, rotation, count);
         }
 
-        return Instantiate(FloorList[randomNumFloor], LevelGenerator.Instance.transform.position + position, rotation, _chunkParent);
+        return Instantiate(FloorList[randomNumFloor], LevelGenerator.Instance.transform.position + position, rotation, _randomFloorParent);
     }
 
     private Floor GetRecycledFloor(Vector3 position, int randomNumFloor, Quaternion rotation, int count)
@@ -42,7 +42,7 @@ public class RandomFloor : MonoBehaviour
         _deactivatedFloors[randomNumFloor].RemoveAt(count - 1);
         reusedFloor.transform.position = LevelGenerator.Instance.transform.position + position;
         reusedFloor.transform.rotation = rotation;
-        reusedFloor.transform.SetParent(_chunkParent);
+        reusedFloor.transform.SetParent(_randomFloorParent);
         reusedFloor.gameObject.SetActive(true);
         return reusedFloor;
     }

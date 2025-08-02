@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour, IObserveTellObstacleHitKing
 {
-    public King king;
+    public KingControler king;
     public Vector3 offset = new Vector3(0, 3.5f, -5f);
     public Vector3 fixedEulerAngles = new Vector3(17.5f, 0f, 0f);
 
@@ -45,11 +45,11 @@ public class CameraFollow : MonoBehaviour, IObserveTellObstacleHitKing
 
     void OnEnable()
     {
-        Subject.Instance.AddObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
+        SubjectObstacleHitKing.Instance.AddObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
     }
 
     void OnDestroy()
     {
-        Subject.Instance.RemoveObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
+        SubjectObstacleHitKing.Instance.RemoveObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
     }
 }
