@@ -16,6 +16,8 @@ public class RandomFloor : MonoBehaviour
 
     void Awake()
     {
+        Floor.InitializeFloorTypes(FloorList);
+
         for (int i = 0; i < TotalFloorTypes; i++)
             _deactivatedFloors[i] = new();
     }
@@ -57,7 +59,7 @@ public class RandomFloor : MonoBehaviour
             return;
         }
 
-         _deactivatedFloors[type].Add(floor);
+        _deactivatedFloors[type].Add(floor);
 
         floor.gameObject.SetActive(false);
     }
