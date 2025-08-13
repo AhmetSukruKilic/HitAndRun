@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - King
+  - Obstacle
+  - Floor1
+  - Floor2
   layers:
   - Default
   - TransparentFX

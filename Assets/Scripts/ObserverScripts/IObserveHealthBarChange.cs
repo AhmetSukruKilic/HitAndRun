@@ -1,4 +1,4 @@
 public interface IObserveHealthBarChange
 {
-    void OnNotifyHealthBarChange();
+    void OnNotifyHealthBarChange(int currHealth);
 }

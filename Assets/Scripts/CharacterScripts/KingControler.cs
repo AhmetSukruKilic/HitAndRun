@@ -2,6 +2,9 @@ using UnityEngine;
 
 public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
 {
+    [SerializeField] private Transform heartsParent;         
+    [SerializeField] private GameObject heartContainerPrefab; 
+
     private KingStats _kingStats;
     public KingStats KingStats { get => _kingStats; set => _kingStats = value; }
 
@@ -20,6 +23,11 @@ public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
     void Awake()
     {
         KingStats = new KingStats();
+
+        var _healthUI = new HealthUI(heartsParent, heartContainerPrefab);
+        _healthUI.Init(KingStats.MaxHealth);
+
+        
         transform.position = START_SET;
 
         _rb = GetComponent<Rigidbody>();
@@ -44,7 +52,6 @@ public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
             if (_forwardTimer >= TIME_DURATION / 2)
             {
                 MoveForward();
-
             }
 
             if (_forwardTimer >= TIME_DURATION)

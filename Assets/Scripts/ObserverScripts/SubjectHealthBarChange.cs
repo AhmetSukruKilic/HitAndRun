@@ -4,7 +4,7 @@ public class SubjectHealthBarChange
 {
     public static SubjectHealthBarChange Instance { get; private set; } = new();
 
-    public event Action TellHealthBarChange;
+    public event Action<int> TellHealthBarChange;
 
     private SubjectHealthBarChange()
     {
@@ -16,18 +16,18 @@ public class SubjectHealthBarChange
         Instance = null;
     }
 
-    public void AddObserverTellHealthBarChange(Action observer)
+    public void AddObserverTellHealthBarChange(Action<int> observer)
     {
         TellHealthBarChange += observer;
     }
 
-    public void RemoveObserverTellHealthBarChange(Action observer)
+    public void RemoveObserverTellHealthBarChange(Action<int> observer)
     {
         TellHealthBarChange -= observer;
     }
 
-    public void NotifyObserversTellHealthBarChange()
+    public void NotifyObserversTellHealthBarChange(int currHealth)
     {
-        TellHealthBarChange?.Invoke();
+        TellHealthBarChange?.Invoke(currHealth);
     }
 }

@@ -1,84 +1,110 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HealthBarController : MonoBehaviour, IObserveHealthBarChange
+public sealed class HealthUI : IObserveHealthBarChange, IDisposable
 {
-    [SerializeField]
-    private KingControler king;
-    private GameObject[] heartContainers;
-    private Image[] heartFills;
-    
-    public Transform heartsParent;
-    public GameObject heartContainerPrefab;
-    private const int WIDTH = 67;
+    private readonly Transform _heartsParent;
+    private readonly GameObject _heartContainerPrefab;
+    private readonly List<GameObject> _heartContainers = new();
+    private readonly List<Image> _heartFills = new();
 
-    void Start()
+    private const int WIDTH = 67; // px offset if you aren't using a LayoutGroup
+
+    public static HealthUI Instance { get; private set; }
+
+    public int MaxHealth => _heartContainers.Count;
+
+    public HealthUI(Transform heartsParent, GameObject heartContainerPrefab)
     {
-        heartContainers = new GameObject[(int)king.KingStats.MaxHealth];
-        heartFills = new Image[(int)king.KingStats.MaxHealth];
+        _heartsParent = heartsParent;
+        _heartContainerPrefab = heartContainerPrefab;
+    }
 
+    /// <summary>Build hearts and subscribe to health change notifications.</summary>
+    public void Init(int maxHealth)
+    {
+        // Replace prior instance if any
+        Instance?.Dispose();
+        Instance = this;
+
+        // Subscribe to your subject/bus
         SubjectHealthBarChange.Instance.AddObserverTellHealthBarChange(OnNotifyHealthBarChange);
 
-        InstantiateHeartContainers();
-        UpdateHeartsHUD();
+        BuildHearts(maxHealth);
     }
 
-    public void OnNotifyHealthBarChange()
+    public void Dispose()
     {
-        UpdateHeartsHUD();
+        // Unsubscribe and destroy UI
+        SubjectHealthBarChange.Instance.RemoveObserverTellHealthBarChange(OnNotifyHealthBarChange);
+        ClearHearts();
+
+        if (ReferenceEquals(Instance, this))
+            Instance = null;
     }
 
-    public void UpdateHeartsHUD()
+    private void BuildHearts(int maxHealth)
     {
-        SetHeartContainers();
-        SetFilledHearts();
-    }
+        ClearHearts();
 
-    void SetHeartContainers()
-    {
-        for (int i = 0; i < heartContainers.Length; i++)
+        for (int i = 0; i < maxHealth; i++)
         {
-            if (i < king.KingStats.MaxHealth)
-            {
-                heartContainers[i].SetActive(true);
-            }
-            else
-            {
-                heartContainers[i].SetActive(false);
-            }
+            // NOTE: using UnityEngine.Object.Instantiate from a non-MonoBehaviour is fine
+            GameObject go = UnityEngine.Object.Instantiate(_heartContainerPrefab, _heartsParent, false);
+            // If you're not using a HorizontalLayoutGroup, offset manually:
+            go.transform.localPosition += new Vector3(i * WIDTH, 0, 0);
+
+            _heartContainers.Add(go);
+
+            var fill = go.transform.Find("HeartFill")?.GetComponent<Image>();
+            if (fill == null)
+                Debug.LogError("HealthUI: 'HeartFill' child Image not found on heartContainerPrefab.");
+            _heartFills.Add(fill);
         }
     }
 
-    void SetFilledHearts()
+    private void ClearHearts()
     {
-        for (int i = 0; i < heartFills.Length; i++)
+        // Destroy container GOs; no need to destroy Image separately
+        for (int i = 0; i < _heartContainers.Count; i++)
         {
-            if (i < king.KingStats.CurrHealth)
-            {
-                heartFills[i].fillAmount = 1;
-            }
-            else
-            {
-                heartFills[i].fillAmount = 0;
-            }
+            if (_heartContainers[i])
+                UnityEngine.Object.Destroy(_heartContainers[i]);
         }
+        _heartContainers.Clear();
+        _heartFills.Clear();
+    }
 
-        if (king.KingStats.CurrHealth % 1 != 0)
+    // ----- Observer callback -----
+    // If you want half-hearts, change the parameter type in your subject/interface to float.
+    public void OnNotifyHealthBarChange(int currHealth)
+    {
+        SetFilledHearts(currHealth);
+    }
+
+    // Integer hearts version
+    private void SetFilledHearts(int currHealth)
+    {
+        for (int i = 0; i < MaxHealth; i++)
         {
-            int lastPos = Mathf.FloorToInt(king.KingStats.CurrHealth);
-            heartFills[lastPos].fillAmount = king.KingStats.CurrHealth % 1;
+            if (_heartFills[i] == null) continue;
+            _heartFills[i].fillAmount = (i < currHealth) ? 1f : 0f;
         }
     }
 
-    void InstantiateHeartContainers()
+    // Optional: fractional hearts support (call this from a float-based observer)
+    public void SetFilledHeartsFloat(float currHealth)
     {
-        for (int i = 0; i < king.KingStats.MaxHealth; i++)
+        int full = Mathf.FloorToInt(currHealth);
+        for (int i = 0; i < MaxHealth; i++)
         {
-            GameObject temp = Instantiate(heartContainerPrefab, heartsParent, false);
-            temp.transform.localPosition += new Vector3(i * WIDTH, 0, 0);
-            heartContainers[i] = temp;
-            heartFills[i] = temp.transform.Find("HeartFill").GetComponent<Image>();
+            if (_heartFills[i] == null) continue;
+
+            if (i < full) _heartFills[i].fillAmount = 1f;
+            else if (i == full) _heartFills[i].fillAmount = Mathf.Clamp01(currHealth - full);
+            else _heartFills[i].fillAmount = 0f;
         }
     }
-
 }

@@ -10,7 +10,7 @@ public class KingStats: IObserveTellObstacleHitKing
     
     private int _currHealth;
     public int CurrHealth { get => _currHealth;
-                        set { _currHealth = value; SubjectHealthBarChange.Instance.NotifyObserversTellHealthBarChange(); } }
+                        set { _currHealth = value; SubjectHealthBarChange.Instance.NotifyObserversTellHealthBarChange(_currHealth); } }
 
     private int _maxHealth = 3;
     private int _minHealth = 0;
