@@ -693,6 +693,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f44639543467947ec8b2cf233f700be1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  heartsParent: {fileID: 868117515}
+  heartContainerPrefab: {fileID: 1000013667988280, guid: 677e3f20f0ab76a45bd59d5b73b0b446, type: 3}
 --- !u!1 &1233016037
 GameObject:
   m_ObjectHideFlags: 0
@@ -702,7 +704,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1233016039}
-  - component: {fileID: 1233016038}
   m_Layer: 0
   m_Name: HealthSystem
   m_TagString: Untagged
@@ -710,21 +711,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1233016038
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1233016037}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: efc35d89d88d247f9be2bcce81919dee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  king: {fileID: 1162054900}
-  heartsParent: {fileID: 868117515}
-  heartContainerPrefab: {fileID: 1000013667988280, guid: 677e3f20f0ab76a45bd59d5b73b0b446, type: 3}
 --- !u!4 &1233016039
 Transform:
   m_ObjectHideFlags: 0

@@ -1,11 +1,22 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ThrowableObstacle : Obstacle
 {
-    private int _floorType;
-    public int FloorType { get => _floorType; }
-
+    public int ThrowableObstacleType { get => tagToId[this.gameObject.tag]; }
+    private static Dictionary<string, int> tagToId = new();
     private float _speed = 10f;
+
+    public static void InitializeThrowableObstacleTypes(List<ThrowableObstacle> throwableobstacles)
+    {
+        foreach (ThrowableObstacle throwableobstacle in throwableobstacles)
+        {
+            if (!tagToId.ContainsKey(throwableobstacle.gameObject.tag))
+            {
+                tagToId.Add(throwableobstacle.gameObject.tag, tagToId.Count);
+            }
+        }
+    }
 
     void Update()
     {

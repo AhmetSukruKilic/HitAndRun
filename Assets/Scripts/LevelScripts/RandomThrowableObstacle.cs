@@ -4,51 +4,71 @@ using UnityEngine;
 public class RandomThrowableObstacle : MonoBehaviour
 {
     [SerializeField]
-    private Transform _throwableParent;
+    private Transform _randomThrowableObstacleParent;
 
     [SerializeField]
     private List<ThrowableObstacle> _throwableObstacleList;
     public List<ThrowableObstacle> ThrowableObstacleList { get => _throwableObstacleList; }
     public int TotalThrowableObstacleTypes { get => ThrowableObstacleList.Count; }
 
-    private Dictionary<int, List<ThrowableObstacle>> _deactivatedObstacles = new();
+    private Dictionary<int, List<ThrowableObstacle>> _deactivatedThrowableObstacles = new();
+    
 
     void Awake()
     {
-        for (int i=0; i<TotalThrowableObstacleTypes; i++)
-            _deactivatedObstacles[i] = new();
+        ThrowableObstacle.InitializeThrowableObstacleTypes(ThrowableObstacleList);
+
+        for (int i = 0; i < TotalThrowableObstacleTypes; i++)
+            _deactivatedThrowableObstacles[i] = new();
     }
 
-    internal ThrowableObstacle GenerateRandomFloor(Vector3 position) // made this so it creates randomly
+    internal ThrowableObstacle GenerateRandomThrowableObstacle(Vector3 position)
     {
-        int randomNum = Random.Range(0, TotalThrowableObstacleTypes);
+        int randomNumThrowableObstacle = Random.Range(0, TotalThrowableObstacleTypes);
+        int randomAngleNumber = Random.Range(0, 2);
 
-        if (_deactivatedObstacles[randomNum].Count > 0)
+        Quaternion rotation = randomAngleNumber == 0 ? Quaternion.identity : Quaternion.Euler(0, 180, 0);
+        int count = _deactivatedThrowableObstacles[randomNumThrowableObstacle].Count;
+
+        if (count > 0)
         {
-            ThrowableObstacle reusedObstacle = _deactivatedObstacles[randomNum][0];
-            _deactivatedObstacles[randomNum].RemoveAt(0);
-            reusedObstacle.transform.position = LevelGenerator.Instance.transform.position + position;
-            reusedObstacle.transform.rotation = Quaternion.identity;
-            reusedObstacle.transform.SetParent(_throwableParent);
-            reusedObstacle.gameObject.SetActive(true);
-            return reusedObstacle;
+            return GetRecycledThrowableObstacle(position, randomNumThrowableObstacle, rotation, count);
         }
-        
-        return Instantiate(ThrowableObstacleList[randomNum], LevelGenerator.Instance.transform.position + position, Quaternion.identity, _throwableParent);
+
+        return Instantiate(ThrowableObstacleList[randomNumThrowableObstacle], LevelGenerator.Instance.transform.position + position, rotation, _randomThrowableObstacleParent);
     }
 
-    internal void DeactivateFloor(ThrowableObstacle throwableObstacle)
+    private ThrowableObstacle GetRecycledThrowableObstacle(Vector3 position, int randomNumThrowableObstacle, Quaternion rotation, int count)
     {
-        int type = throwableObstacle.FloorType;
+        ThrowableObstacle reusedThrowableObstacle = _deactivatedThrowableObstacles[randomNumThrowableObstacle][count - 1];
+        _deactivatedThrowableObstacles[randomNumThrowableObstacle].RemoveAt(count - 1);
+        reusedThrowableObstacle.transform.position = LevelGenerator.Instance.transform.position + position;
+        reusedThrowableObstacle.transform.rotation = rotation;
+        reusedThrowableObstacle.transform.SetParent(_randomThrowableObstacleParent);
+        reusedThrowableObstacle.gameObject.SetActive(true);
+        return reusedThrowableObstacle;
+    }
 
-        if (!_deactivatedObstacles.ContainsKey(type))
+    internal void DeactivateThrowableObstacle(ThrowableObstacle ThrowableObstacle)
+    {
+        int type = ThrowableObstacle.ThrowableObstacleType;
+
+        if (!_deactivatedThrowableObstacles.ContainsKey(type))
         {
-            Debug.Log("No such floor.");
+            Debug.Log("No such ThrowableObstacle.");
             return;
         }
 
-         _deactivatedObstacles[type].Add(throwableObstacle);
+        _deactivatedThrowableObstacles[type].Add(ThrowableObstacle);
 
-        throwableObstacle.gameObject.SetActive(false);
+        ThrowableObstacle.gameObject.SetActive(false);
     }
 }
+
+
+
+
+
+
+
+
