@@ -2,11 +2,8 @@ using UnityEngine;
 
 public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
 {
-    [SerializeField] private Transform heartsParent;         
-    [SerializeField] private GameObject heartContainerPrefab; 
-
     private KingStats _kingStats;
-    public KingStats KingStats { get => _kingStats; set => _kingStats = value; }
+    public KingStats KingStats { get => _kingStats; private set => _kingStats = value; }
 
     private Rigidbody _rb;
 
@@ -18,15 +15,10 @@ public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
     private const float TIME_DURATION = 4;
     private readonly Vector3 START_SET = new(0, 0.1f, -0.3f);
     private const float TARGET_Z = 0f;
-
-
-    void Awake()
+  
+    void Start()
     {
         KingStats = new KingStats();
-
-        var _healthUI = new HealthUI(heartsParent, heartContainerPrefab);
-        _healthUI.Init(KingStats.MaxHealth);
-
         
         transform.position = START_SET;
 

@@ -1,13 +1,16 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 public class UIController : MonoBehaviour
 {
-    [SerializeField] 
+    [SerializeField]
     private List<UIPanel> _panels = new List<UIPanel>();
 
     private void Awake()
     {
         EventManager.Instance.GameFailed += OnGameFailed;
         EventManager.Instance.SettingsButtonClicked += OnSettingsButtonClicked;
-        
+
         for (int i = 0; i < _panels.Count; i++)
         {
             if (_panels[i].PanelType == PanelType.InGame)
@@ -34,7 +37,7 @@ public class UIController : MonoBehaviour
     public void OpenPanel(PanelType panelType)
     {
         _panels.ForEach(p => p.gameObject.SetActive(false));
-        
+
         _panels.Find(p => p.PanelType == panelType)?.gameObject.SetActive(true);
     }
 }

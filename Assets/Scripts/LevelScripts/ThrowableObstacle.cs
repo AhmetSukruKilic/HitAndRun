@@ -11,6 +11,7 @@ public class ThrowableObstacle : Obstacle
     {
         foreach (ThrowableObstacle throwableobstacle in throwableobstacles)
         {
+            return;
             if (!tagToId.ContainsKey(throwableobstacle.gameObject.tag))
             {
                 tagToId.Add(throwableobstacle.gameObject.tag, tagToId.Count);
