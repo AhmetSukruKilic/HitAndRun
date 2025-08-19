@@ -9,6 +9,9 @@ public class SettingsPanel : UIPanel
     private Button _resumeButton;
 
     [SerializeField]
+    private Button _restartButton;
+
+    [SerializeField]
     private Slider _volumeSlider;
 
     private void Awake()

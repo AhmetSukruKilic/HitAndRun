@@ -28,6 +28,7 @@ public class RandomThrowableObstacle : MonoBehaviour
         int randomAngleNumber = Random.Range(0, 2);
 
         Quaternion rotation = randomAngleNumber == 0 ? Quaternion.identity : Quaternion.Euler(0, 180, 0);
+        rotation *= _randomThrowableObstacleParent.rotation;
         int count = _deactivatedThrowableObstacles[randomNumThrowableObstacle].Count;
 
         if (count > 0)

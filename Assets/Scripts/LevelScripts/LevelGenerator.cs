@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,10 +14,18 @@ public class LevelGenerator : MonoBehaviour
     private RandomFloor randomFloor;
 
     [SerializeField]
-    private Floor _defaultFloor;
+    private RandomThrowableObstacle randomThObstacle;
 
+    [SerializeField]
+    private readonly Queue<ThrowableObstacle> pastThObstacles = new();
+
+    [SerializeField]
+    private Floor _defaultFloor;
     private Floor _currentFloor;
-    private Queue<Floor> pastFloors = new();
+    private readonly Queue<Floor> pastFloors = new();
+
+    private float _timeCountForObstacleThrow = 0f;
+    private const float THROW_TIME = 1f;
 
     private Vector3 _offsetVector;
     private float _lengthOfFloor;
@@ -24,6 +33,7 @@ public class LevelGenerator : MonoBehaviour
     private const float CAMERA_DISTANCE = 2.5f;
     private readonly Vector3 INITIAL_POSITION = new Vector3(0, 0, 6);
     public const int INITIAL_NUMBER_FLOORS = 9;
+
 
     void Start()
     {
@@ -42,6 +52,8 @@ public class LevelGenerator : MonoBehaviour
 
         InitializeConsts();
         InitialFloors();
+
+        pastThObstacles.Enqueue(randomThObstacle.GenerateRandomThrowableObstacle(randomThObstacle.transform.position));  // change the throw position
     }
 
     private void InitializeConsts()
@@ -73,11 +85,32 @@ public class LevelGenerator : MonoBehaviour
     {
         if (pastFloors?.Peek().transform.position.z < _destroyIndex)
         {
-            randomFloor.DeactivateFloor(pastFloors.Dequeue());
-            pastFloors.Enqueue(_currentFloor);
-            _currentFloor = randomFloor.GenerateRandomFloor(_offsetVector);
+            BuildAndDestroyFloor();
         }
-    }    
-    
+
+        _timeCountForObstacleThrow += Time.deltaTime;
+
+        if (_timeCountForObstacleThrow >= THROW_TIME)
+        {
+            BuildAndDestroyThObstacle();
+            _timeCountForObstacleThrow = 0;
+        }
+
+    }
+
+    private void BuildAndDestroyFloor()
+    {
+        randomFloor.DeactivateFloor(pastFloors.Dequeue());
+        pastFloors.Enqueue(_currentFloor);
+        _currentFloor = randomFloor.GenerateRandomFloor(_offsetVector);
+    }
+
+    private void BuildAndDestroyThObstacle()
+    {
+        if (pastThObstacles.Count >= 5)
+            randomThObstacle.DeactivateThrowableObstacle(pastThObstacles.Dequeue());
+
+        pastThObstacles.Enqueue(randomThObstacle.GenerateRandomThrowableObstacle(randomThObstacle.transform.position));  // change the throw position
+    }
 
 }

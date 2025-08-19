@@ -11,19 +11,25 @@ public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
     private bool _obstacleHitRecently = true;
     private Vector3 _forceVector;
 
+    private Obstacle _alreadyCollidedObstacle = null;
+
+    private ITriggerable _alreadyTriggeredTriggerable = null;
+
     private const float FRICTION = 0.5f;
     private const float TIME_DURATION = 4;
     private readonly Vector3 START_SET = new(0, 0.1f, -0.3f);
     private const float TARGET_Z = 0f;
-  
+
     void Start()
     {
         KingStats = new KingStats();
-        
+
         transform.position = START_SET;
 
         _rb = GetComponent<Rigidbody>();
         _rb.freezeRotation = true;
+
+        SubjectObstacleHitKing.Instance.AddObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
     }
 
     void Update()
@@ -60,12 +66,12 @@ public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
         float distance = TARGET_Z - currentZ;
         float acceleration = 100 * distance / (TIME_DURATION * TIME_DURATION) / FRICTION;
         float force = _rb.mass * acceleration;
-        
+
         _forceVector = new Vector3(0f, 0f, force);
 
         _rb.AddForce(_forceVector, ForceMode.Force);
     }
-    
+
     private void ResetToDefaultPosition()
     {
         float currentZ = _rb.position.z;
@@ -85,34 +91,42 @@ public class KingControler : MonoBehaviour, IObserveTellObstacleHitKing
 
     private void OnCollisionEnter(Collision collision)
     {
-        Obstacle rootObj = collision.gameObject.GetComponent<Obstacle>();
-
-        if (rootObj != null)
+        if (!collision.gameObject.TryGetComponent<Obstacle>(out var obstacleObj))
         {
-            SubjectObstacleHitKing.Instance.NotifyObserversTellObstacleHitKing();   
+            return;
+        }
+
+        if (_alreadyCollidedObstacle != obstacleObj)
+        {
+            SubjectObstacleHitKing.Instance.NotifyObserversTellObstacleHitKing();
+            _alreadyCollidedObstacle = obstacleObj;
         }
     }
 
-    void OnEnable()
+    void OnTriggerStay(Collider triggered)
     {
-        SubjectObstacleHitKing.Instance.AddObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
+        if (!triggered.gameObject.TryGetComponent<ITriggerable>(out var triggerableObj))
+        {
+            return;
+        }
+
+        if (_alreadyTriggeredTriggerable != triggerableObj)
+        {
+            triggerableObj.Triggered();
+            _alreadyTriggeredTriggerable = triggerableObj;
+        }
+
+        // add coin and health
+    }
+
+    public void OnNotifyTellObstacleHitKing()
+    {
+        _forwardTimer = 0f;
+        _obstacleHitRecently = true;
     }
 
     void OnDestroy()
     {
         SubjectObstacleHitKing.Instance.RemoveObserverTellObstacleHitKing(OnNotifyTellObstacleHitKing);
     }
-
-    public void OnNotifyTellObstacleHitKing()
-    {
-
-        if (_obstacleHitRecently)
-        {
-            Debug.Log("GameEnded");   // put this to Subject to change ui
-        }
-        
-        _forwardTimer = 0f;
-        _obstacleHitRecently = true;
-    }
-
 }

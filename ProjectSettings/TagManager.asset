@@ -8,6 +8,10 @@ TagManager:
   - Obstacle
   - Floor1
   - Floor2
+  - ThObstacle1
+  - ThObstacle2
+  - ThObstacle3
+  - ThObstacle4
   layers:
   - Default
   - TransparentFX
@@ -16,7 +20,7 @@ TagManager:
   - Water
   - UI
   - Ground
-  - 
+  - Wall
   - 
   - 
   - 
