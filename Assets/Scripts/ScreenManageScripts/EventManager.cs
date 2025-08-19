@@ -22,6 +22,7 @@ public class EventManager
     public void SettingsButtonClick()
     {
         SettingsButtonClicked?.Invoke();
+        GamePaused?.Invoke();
     }
 
     public void GameContinue()

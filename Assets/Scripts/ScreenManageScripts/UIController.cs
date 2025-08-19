@@ -10,18 +10,9 @@ public class UIController : MonoBehaviour
     {
         EventManager.Instance.GameFailed += OnGameFailed;
         EventManager.Instance.SettingsButtonClicked += OnSettingsButtonClicked;
+        EventManager.Instance.GameContinued += OnGameContinue;
 
-        for (int i = 0; i < _panels.Count; i++)
-        {
-            if (_panels[i].PanelType == PanelType.InGame)
-            {
-                _panels[i].gameObject.SetActive(true);
-            }
-            else
-            {
-                _panels[i].gameObject.SetActive(false);
-            }
-        }
+        OpenPanel(PanelType.InGame);
     }
 
     private void OnSettingsButtonClicked()
@@ -32,6 +23,11 @@ public class UIController : MonoBehaviour
     private void OnGameFailed()
     {
         OpenPanel(PanelType.GameOver);
+    }
+
+    private void OnGameContinue()
+    {
+        OpenPanel(PanelType.InGame);
     }
 
     public void OpenPanel(PanelType panelType)

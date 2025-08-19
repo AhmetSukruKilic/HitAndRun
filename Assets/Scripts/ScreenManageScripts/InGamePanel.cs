@@ -29,19 +29,11 @@ public class InGamePanel : UIPanel
         _inGameUIs.Add(new HealthUI(_heartsParent, _heartContainerPrefab));
     }
 
-    private void OnDisable()
-    {
-        foreach (var ui in _inGameUIs)
-        {
-            ui.Dispose();
-        }
-    }
-
-    private void OnSettingsButtonClicked()
+    public void OnSettingsButtonClicked()
     {
         EventManager.Instance.SettingsButtonClick();
     }
-
+    
     public IInGameUIElement GetUI<T>(string UIElementName) where T : IInGameUIElement
     {
         return _inGameUIs.OfType<T>().FirstOrDefault(ui => ui.GetName() == UIElementName.ToLowerInvariant());
@@ -49,20 +41,12 @@ public class InGamePanel : UIPanel
 }
 
 
-public interface IInGameUIElement
-{
-    void Dispose();
-    string GetName();
-}
-
-public sealed class HealthUI : IObserveHealthBarChange, IDisposable, IInGameUIElement
+public sealed class HealthUI : IObserveHealthBarChange, IInGameUIElement
 {
     private readonly Transform _heartsParent;
     private readonly GameObject _heartContainerPrefab;
     private readonly List<GameObject> _heartContainers = new();
     private readonly List<Image> _heartFills = new();
-
-    private const int WIDTH = 67; // px offset if you aren't using a LayoutGroup
 
     public static HealthUI Instance { get; private set; }
 
@@ -82,24 +66,12 @@ public sealed class HealthUI : IObserveHealthBarChange, IDisposable, IInGameUIEl
     public void Init(int maxHealth)
     {
         // Replace prior instance if any
-        Instance?.Dispose();
         Instance = this;
 
         // Subscribe to your subject/bus
 
         BuildHearts(maxHealth);
         _isHeartsSet = true;
-    }
-
-    public void Dispose()
-    {
-        // Unsubscribe and destroy UI
-        SubjectHealthBarChange.Instance.RemoveObserverTellHealthBarChange(OnNotifyHealthBarChange);
-        ClearHearts();
-
-        if (ReferenceEquals(Instance, this))
-            Instance = null;
-        _isHeartsSet = false;
     }
 
     private void BuildHearts(int maxHealth)
@@ -109,7 +81,6 @@ public sealed class HealthUI : IObserveHealthBarChange, IDisposable, IInGameUIEl
         for (int i = 0; i < maxHealth; i++)
         {
             GameObject heart = UnityEngine.Object.Instantiate(_heartContainerPrefab, _heartsParent, false);
-            heart.transform.localPosition += new Vector3(i * WIDTH, 0, 0);
 
             _heartContainers.Add(heart);
 
@@ -119,6 +90,7 @@ public sealed class HealthUI : IObserveHealthBarChange, IDisposable, IInGameUIEl
             _heartFills.Add(fill);
         }
     }
+
 
     private void ClearHearts()
     {

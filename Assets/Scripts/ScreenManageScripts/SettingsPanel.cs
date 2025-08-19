@@ -5,7 +5,6 @@ public class SettingsPanel : UIPanel
 {
     public override PanelType PanelType => PanelType.Settings;
 
-
     [SerializeField]
     private Button _resumeButton;
 
@@ -26,12 +25,6 @@ public class SettingsPanel : UIPanel
     private void OnVolumeChanged(float value)
     {
         AudioManager.Instance.SetVolume(value);
-    }
-    
-    private void OnDisable()
-    {
-        _resumeButton.onClick.RemoveListener(OnResumeButtonClicked);
-        _volumeSlider.onValueChanged.RemoveListener(OnVolumeChanged);
     }
 
 }
