@@ -25,7 +25,7 @@ public class LevelGenerator : MonoBehaviour
     private readonly Queue<Floor> pastFloors = new();
 
     private float _timeCountForObstacleThrow = 0f;
-    private const float THROW_TIME = 1f;
+    private const float THROW_TIME = 3f;
 
     private Vector3 _offsetVector;
     private float _lengthOfFloor;
@@ -92,8 +92,13 @@ public class LevelGenerator : MonoBehaviour
 
         if (_timeCountForObstacleThrow >= THROW_TIME)
         {
-            BuildAndDestroyThObstacle();
+            BuildThObstacle();
             _timeCountForObstacleThrow = 0;
+        }
+
+        if (pastThObstacles.Count >= 10)
+        {
+            DestroyThObstacle();
         }
 
     }
@@ -105,12 +110,14 @@ public class LevelGenerator : MonoBehaviour
         _currentFloor = randomFloor.GenerateRandomFloor(_offsetVector);
     }
 
-    private void BuildAndDestroyThObstacle()
+    private void BuildThObstacle()
     {
-        if (pastThObstacles.Count >= 5)
-            randomThObstacle.DeactivateThrowableObstacle(pastThObstacles.Dequeue());
-
         pastThObstacles.Enqueue(randomThObstacle.GenerateRandomThrowableObstacle(randomThObstacle.transform.position));  // change the throw position
+    }
+
+    private void DestroyThObstacle()
+    {
+        randomThObstacle.DeactivateThrowableObstacle(pastThObstacles.Dequeue());
     }
 
 }
