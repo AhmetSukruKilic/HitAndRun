@@ -22,9 +22,6 @@ It combines fast-paced gameplay mechanics with clean software architecture, maki
 - `ProjectSettings/` → Unity configuration files
 - `Packages/` → Dependencies and Unity package references
 
-## 📸 Screenshots / Demo
-_Add screenshots or a GIF here if available._
-
 ## 🔮 Future Improvements
 - Add more levels and enemies
 - Polish UI and sound design
