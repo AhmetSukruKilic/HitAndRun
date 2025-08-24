@@ -6,8 +6,8 @@ public class EventManager
     
     public event Action GameFailed;
     public event Action SettingsButtonClicked;
-    public event Action GameContinued;
-    public event Action GamePaused;
+    public event Action GameRestarted;
+    public event Action IngameGoes;
     
     private EventManager()
     {
@@ -22,17 +22,17 @@ public class EventManager
     public void SettingsButtonClick()
     {
         SettingsButtonClicked?.Invoke();
-        GamePause();
-    }
+   }
 
-    public void GameContinue()
-    {  
-        GameContinued?.Invoke();
-    }
-
-    public void GamePause()
+    public void InGameGo()
     {
-        GamePaused?.Invoke();
+        IngameGoes?.Invoke();
+    }
+
+    public void RestartGame()
+    {
+        GameRestarted?.Invoke();
+        IngameGoes?.Invoke();
     }
 
     ~EventManager()

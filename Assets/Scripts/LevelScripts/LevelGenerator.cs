@@ -15,8 +15,6 @@ public class LevelGenerator : MonoBehaviour
 
     [SerializeField]
     private RandomThrowableObstacle randomThObstacle;
-
-    [SerializeField]
     private readonly Queue<ThrowableObstacle> pastThObstacles = new();
 
     [SerializeField]
@@ -29,10 +27,20 @@ public class LevelGenerator : MonoBehaviour
 
     private Vector3 _offsetVector;
     private float _lengthOfFloor;
+    private float _widthOfFloor;
     private float _destroyIndex;
     private const float CAMERA_DISTANCE = 2.5f;
     private readonly Vector3 INITIAL_POSITION = new Vector3(0, 0, 6);
     public const int INITIAL_NUMBER_FLOORS = 9;
+
+    public Vector3 RandomLane
+    {
+        get
+        {
+            float lane = UnityEngine.Random.Range(-_widthOfFloor/2, _widthOfFloor/2);
+            return new Vector3(lane, 0, 0);
+        }
+    }
 
 
     void Start()
@@ -62,6 +70,7 @@ public class LevelGenerator : MonoBehaviour
         if (floorBlock != null)
         {
             _lengthOfFloor = floorBlock.localScale.z;
+            _widthOfFloor = floorBlock.localScale.x;
             _destroyIndex = -3 * _lengthOfFloor / 2 - CAMERA_DISTANCE;
         }
         else
@@ -112,7 +121,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void BuildThObstacle()
     {
-        pastThObstacles.Enqueue(randomThObstacle.GenerateRandomThrowableObstacle(randomThObstacle.transform.position));  // change the throw position
+        pastThObstacles.Enqueue(randomThObstacle.GenerateRandomThrowableObstacle(randomThObstacle.transform.position + RandomLane));  // change the throw position
     }
 
     private void DestroyThObstacle()

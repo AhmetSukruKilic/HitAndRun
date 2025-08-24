@@ -18,11 +18,17 @@ public class SettingsPanel : UIPanel
     {
         _resumeButton.onClick.AddListener(OnResumeButtonClicked);
         _volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
+        _restartButton.onClick.AddListener(OnRestartButtonClicked);
     }
 
     private void OnResumeButtonClicked()
     {
-        EventManager.Instance.GameContinue();
+        EventManager.Instance.InGameGo();
+    }
+
+    private void OnRestartButtonClicked()
+    {
+        EventManager.Instance.RestartGame();
     }
 
     private void OnVolumeChanged(float value)
